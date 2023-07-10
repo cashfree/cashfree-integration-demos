@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Cashfree Checkout</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" rel="stylesheet">
+    <!-- CSS -->
+    <link href="style.css" rel="stylesheet">
+    <meta name="robots" content="noindex,follow" />
+    <script type="text/javascript" src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
+
+  </head>
+
+  <body>
+    <main class="container">
+
+      <!-- Right Column -->
+      <div class="right-column">
+
+        <!-- Product Description -->
+        <div class="product-description">
+          <span>Headphones</span>
+          <h1>Beats EP</h1>
+          <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p>
+        </div>
+
+        <!-- Product Pricing -->
+        <div class="product-price">
+          <span>10₹</span>
+            <input type="hidden" id="customer_id" name="customer_id" value="customer_id">
+            <input type="hidden" id="order_amount" name="order_amount" value="10">
+            <input type="hidden" id="customer_phone" name="customer_phone" value="9999999999">
+            <input type="hidden" id="order_currency" name="order_currency" value="INR">
+            <input class="cart-btn" type="submit" value="Add to cart"  onclick="paynow()">
+        </div>
+      </div>
+    </main>
+  </body>
+  <script>
+  function paynow() {
+    let postObj = { 
+        customer_id: document.getElementById("customer_id").value, 
+        order_amount:  document.getElementById("order_amount").value,
+        customer_phone: document.getElementById("customer_phone").value,
+        order_currency: document.getElementById("order_currency").value,
+        order_id: "order_"+Math.floor(100000 + Math.random() * 900000),
+    }
+    const cashfree = Cashfree({mode:"production"});
+    let post = JSON.stringify(postObj)
+    const url = "php/index.php"
+    let xhr = new XMLHttpRequest()
+    xhr.open('POST', url, true)
+    xhr.setRequestHeader('Content-type', 'application/json; charset=UTF-8')
+    xhr.send(post);
+    xhr.onload = function () {
+      if(xhr.status === 200) {
+
+        //Cashfree V3 JS SDK
+        const response = JSON.parse(xhr.response);
+        cashfree.checkout({
+            paymentSessionId: response.payment_session_id,
+            redirectTarget: "_self"
+        })
+      }
+    }
+  }    
+  </script>
+</html>
